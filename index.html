@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>College Attendance System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f5f5;
+            display: flex;
+            height: 100vh;
+        }
+
+        .sidebar {
+            width: 250px;
+            background-color: #ffffff;
+            box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+            padding: 20px 0;
+            overflow-y: auto;
+        }
+
+        .header {
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            margin-bottom: 30px;
+        }
+
+        .logo {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            margin-right: 15px;
+            font-size: 18px;
+        }
+
+        .college-name {
+            font-size: 24px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .navigation-header {
+            padding: 0 20px;
+            margin-bottom: 10px;
+            font-size: 14px;
+            color: #7f8c8d;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .nav-item {
+            padding: 12px 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+            color: #2c3e50;
+        }
+
+        .nav-item:hover {
+            background-color: #ecf0f1;
+            border-left-color: #3498db;
+        }
+
+        .nav-item.active {
+            background-color: #e8e3ff;
+            border-left-color: #8e44ad;
+            color: #8e44ad;
+            font-weight: 600;
+        }
+
+        .main-content {
+            flex: 1;
+            padding: 0;
+            overflow-y: auto;
+        }
+
+        .top-bar {
+            background-color: #ffffff;
+            padding: 15px 30px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .menu-toggle {
+            display: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #2c3e50;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            background-color: #bdc3c7;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 18px;
+        }
+
+        .user-details {
+            text-align: right;
+        }
+
+        .user-name {
+            font-weight: 600;
+            color: #2c3e50;
+            font-size: 14px;
+        }
+
+        .user-email {
+            color: #7f8c8d;
+            font-size: 12px;
+        }
+
+        .content-area {
+            padding: 30px;
+        }
+
+        .page-title {
+            font-size: 32px;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 5px;
+        }
+
+        .page-subtitle {
+            color: #7f8c8d;
+            font-size: 16px;
+            margin-bottom: 30px;
+        }
+
+        .attendance-section {
+            display: grid;
+            grid-template-columns: 1fr 300px;
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .fingerprint-container {
+            background-color: #ffffff;
+            border-radius: 15px;
+            padding: 40px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        .fingerprint-scanner {
+            width: 200px;
+            height: 200px;
+            background: linear-gradient(135deg, #bdc3c7, #95a5a6);
+            border-radius: 50%;
+            margin: 0 auto 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .fingerprint-scanner:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .fingerprint-scanner.scanning {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        .fingerprint-inner {
+            width: 120px;
+            height: 120px;
+            border: 4px solid #ffffff;
+            border-radius: 50%;
+            position: relative;
+        }
+
+        .fingerprint-inner::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 80px;
+            height: 80px;
+            border: 3px solid #ffffff;
+            border-radius: 50%;
+        }
+
+        .scanner-text {
+            font-size: 24px;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+
+        .scanner-status {
+            color: #7f8c8d;
+            font-size: 14px;
+        }
+
+        .today-attendance {
+            background-color: #ffffff;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .today-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .attendance-status {
+            text-align: center;
+            color: #7f8c8d;
+            font-size: 14px;
+        }
+
+        .classes-section {
+            background-color: #ffffff;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .section-title {
+            font-size: 24px;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 20px;
+        }
+
+        .class-card {
+            display: flex;
+            background-color: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .class-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+
+        .class-image {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #ddd, #bbb);
+            border-radius: 10px;
+            margin-right: 20px;
+            flex-shrink: 0;
+        }
+
+        .class-content {
+            flex: 1;
+        }
+
+        .class-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+
+        .class-description {
+            color: #7f8c8d;
+            font-size: 14px;
+            line-height: 1.5;
+            margin-bottom: 15px;
+        }
+
+        .class-button {
+            background-color: #ecf0f1;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 5px;
+            color: #2c3e50;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .class-button:hover {
+            background-color: #bdc3c7;
+        }
+
+        .success-message {
+            background-color: #d4edda;
+            color: #155724;
+            padding: 10px;
+            border-radius: 5px;
+            margin-top: 10px;
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            .attendance-section {
+                grid-template-columns: 1fr;
+            }
+            
+            .sidebar {
+                width: 100%;
+                position: absolute;
+                left: -100%;
+                transition: left 0.3s ease;
+                z-index: 1000;
+            }
+            
+            .sidebar.open {
+                left: 0;
+            }
+            
+            .menu-toggle {
+                display: block;
+            }
+            
+            .main-content {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar" id="sidebar">
+        <div class="header">
+            <div class="logo">C</div>
+            <div class="college-name">College Name</div>
+        </div>
+        
+        <div class="navigation-header">Navigation</div>
+        
+        <div class="nav-item" onclick="navigateTo('dashboard')">Dashboard</div>
+        <div class="nav-item active" onclick="navigateTo('attendance')">Attendance</div>
+        <div class="nav-item" onclick="navigateTo('academic')">Academic calendar</div>
+        <div class="nav-item" onclick="navigateTo('syllabus')">Syllabus</div>
+        <div class="nav-item" onclick="navigateTo('certificates')">Certificates</div>
+        <div class="nav-item" onclick="navigateTo('notifications')">Notifications</div>
+        <div class="nav-item" onclick="navigateTo('profile')">Profile</div>
+        <div class="nav-item" onclick="navigateTo('settings')">Settings</div>
+        <div class="nav-item" onclick="navigateTo('assignments')">Assignments</div>
+        <div class="nav-item" onclick="navigateTo('exam-marks')">Exam marks</div>
+    </div>
+
+    <div class="main-content">
+        <div class="top-bar">
+            <div class="menu-toggle" onclick="toggleSidebar()">☰</div>
+            <div class="user-info">
+                <div class="user-details">
+                    <div class="user-name">Jim Dallingham Young</div>
+                    <div class="user-email">jimdy789@gmail.com</div>
+                </div>
+                <div class="user-avatar">👤</div>
+            </div>
+        </div>
+
+        <div class="content-area">
+            <h1 class="page-title">Attendance</h1>
+            <p class="page-subtitle">Mark your attendance</p>
+
+            <div class="attendance-section">
+                <div class="fingerprint-container">
+                    <div class="fingerprint-scanner" id="fingerprintScanner" onclick="scanFingerprint()">
+                        <div class="fingerprint-inner"></div>
+                    </div>
+                    <div class="scanner-text">Finger print scanner</div>
+                    <div class="scanner-status" id="scannerStatus">Place your finger on the scanner</div>
+                    <div class="success-message" id="successMessage">
+                        Attendance marked successfully!
+                    </div>
+                </div>
+
+                <div class="today-attendance">
+                    <h3 class="today-title">Today's<br>Attendance</h3>
+                    <div class="attendance-status" id="attendanceStatus">
+                        Not marked yet
+                    </div>
+                </div>
+            </div>
+
+            <div class="classes-section">
+                <h2 class="section-title">Today's Classes</h2>
+                
+                <div class="class-card">
+                    <div class="class-image"></div>
+                    <div class="class-content">
+                        <div class="class-title">Title</div>
+                        <div class="class-description">
+                            Body text for whatever you'd like to say. Add main takeaway points, quotes, anecdotes, or even a very short story.
+                        </div>
+                        <button class="class-button" onclick="joinClass('class1')">Button</button>
+                    </div>
+                </div>
+
+                <div class="class-card">
+                    <div class="class-image"></div>
+                    <div class="class-content">
+                        <div class="class-title">Title</div>
+                        <div class="class-description">
+                            Body text for whatever you'd like to say. Add main takeaway points, quotes, anecdotes, or even a very short story.
+                        </div>
+                        <button class="class-button" onclick="joinClass('class2')">Button</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let isScanning = false;
+        let attendanceMarked = false;
+        let userCredential = null;
+
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('open');
+        }
+
+        function navigateTo(page) {
+            // Remove active class from all nav items
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            
+            // Add active class to clicked item
+            event.target.classList.add('active');
+            
+            // Close sidebar on mobile
+            if (window.innerWidth <= 768) {
+                document.getElementById('sidebar').classList.remove('open');
+            }
+            
+            console.log(`Navigating to: ${page}`);
+        }
+
+        // Generate random challenge for WebAuthn
+        function generateChallenge() {
+            const array = new Uint8Array(32);
+            crypto.getRandomValues(array);
+            return array;
+        }
+
+        // Generate random user ID
+        function generateUserId() {
+            const array = new Uint8Array(16);
+            crypto.getRandomValues(array);
+            return array;
+        }
+
+        // Check if WebAuthn is supported
+        function isWebAuthnSupported() {
+            return window.PublicKeyCredential && 
+                   navigator.credentials && 
+                   navigator.credentials.create;
+        }
+
+        // Register user with WebAuthn (first time setup)
+        async function registerFingerprint() {
+            if (!isWebAuthnSupported()) {
+                throw new Error('WebAuthn not supported');
+            }
+
+            const publicKey = {
+                challenge: generateChallenge(),
+                rp: { 
+                    name: "College Attendance System",
+                    id: window.location.hostname
+                },
+                user: {
+                    id: generateUserId(),
+                    name: "jimdy789@gmail.com",
+                    displayName: "Jim Dallingham Young"
+                },
+                pubKeyCredParams: [{ alg: -7, type: "public-key" }],
+                authenticatorSelection: {
+                    authenticatorAttachment: "platform",
+                    userVerification: "required"
+                },
+                timeout: 60000,
+                attestation: "direct"
+            };
+
+            try {
+                const credential = await navigator.credentials.create({ publicKey });
+                console.log("Registration successful!", credential);
+                
+                // Store credential ID for future authentication
+                localStorage.setItem('credentialId', btoa(String.fromCharCode(...new Uint8Array(credential.rawId))));
+                
+                return credential;
+            } catch (error) {
+                console.error("Registration failed:", error);
+                throw error;
+            }
+        }
+
+        // Authenticate user with WebAuthn
+        async function authenticateFingerprint() {
+            if (!isWebAuthnSupported()) {
+                throw new Error('WebAuthn not supported');
+            }
+
+            const credentialId = localStorage.getItem('credentialId');
+            if (!credentialId) {
+                // First time - need to register
+                await registerFingerprint();
+                return authenticateFingerprint();
+            }
+
+            const publicKey = {
+                challenge: generateChallenge(),
+                allowCredentials: [{
+                    type: "public-key",
+                    id: Uint8Array.from(atob(credentialId), c => c.charCodeAt(0)),
+                    transports: ["internal"]
+                }],
+                timeout: 60000,
+                userVerification: "required"
+            };
+
+            try {
+                const assertion = await navigator.credentials.get({ publicKey });
+                console.log("Authentication successful!", assertion);
+                return assertion;
+            } catch (error) {
+                console.error("Authentication failed:", error);
+                throw error;
+            }
+        }
+
+        // Main fingerprint scanning function
+        async function scanFingerprint() {
+            if (isScanning || attendanceMarked) return;
+            
+            isScanning = true;
+            const scanner = document.getElementById('fingerprintScanner');
+            const status = document.getElementById('scannerStatus');
+            const successMessage = document.getElementById('successMessage');
+            const attendanceStatus = document.getElementById('attendanceStatus');
+            
+            // Add scanning animation
+            scanner.classList.add('scanning');
+            status.textContent = 'Place your finger on the sensor...';
+            
+            try {
+                // Check if WebAuthn is supported
+                if (!isWebAuthnSupported()) {
+                    throw new Error('Biometric authentication not supported on this device');
+                }
+
+                // Attempt biometric authentication
+                const credential = await authenticateFingerprint();
+                
+                // Success
+                scanner.classList.remove('scanning');
+                status.textContent = 'Biometric scan complete!';
+                successMessage.style.display = 'block';
+                attendanceStatus.textContent = 'Present - ' + new Date().toLocaleTimeString();
+                attendanceMarked = true;
+                userCredential = credential;
+                
+                // Hide success message after 3 seconds
+                setTimeout(() => {
+                    successMessage.style.display = 'none';
+                    status.textContent = 'Attendance marked';
+                }, 3000);
+                
+            } catch (error) {
+                // Handle errors
+                scanner.classList.remove('scanning');
+                
+                if (error.name === 'NotAllowedError') {
+                    status.textContent = 'Biometric authentication cancelled';
+                } else if (error.name === 'NotSupportedError') {
+                    status.textContent = 'Biometric authentication not supported';
+                    // Fallback to simulation
+                    setTimeout(() => {
+                        simulateFingerprint();
+                    }, 1000);
+                } else if (error.name === 'SecurityError') {
+                    status.textContent = 'Security error - please try again';
+                } else {
+                    status.textContent = 'Authentication failed - trying fallback...';
+                    // Fallback to simulation
+                    setTimeout(() => {
+                        simulateFingerprint();
+                    }, 1000);
+                }
+                
+                console.error('Fingerprint scan error:', error);
+            }
+            
+            isScanning = false;
+        }
+
+        // Fallback simulation for unsupported devices
+        function simulateFingerprint() {
+            const scanner = document.getElementById('fingerprintScanner');
+            const status = document.getElementById('scannerStatus');
+            const successMessage = document.getElementById('successMessage');
+            const attendanceStatus = document.getElementById('attendanceStatus');
+            
+            scanner.classList.add('scanning');
+            status.textContent = 'Scanning... (simulation mode)';
+            
+            setTimeout(() => {
+                scanner.classList.remove('scanning');
+                status.textContent = 'Scan complete!';
+                successMessage.style.display = 'block';
+                attendanceStatus.textContent = 'Present - ' + new Date().toLocaleTimeString();
+                attendanceMarked = true;
+                
+                setTimeout(() => {
+                    successMessage.style.display = 'none';
+                    status.textContent = 'Attendance marked';
+                }, 3000);
+            }, 2000);
+        }
+
+        // Reset attendance (for testing)
+        function resetAttendance() {
+            attendanceMarked = false;
+            const status = document.getElementById('scannerStatus');
+            const attendanceStatus = document.getElementById('attendanceStatus');
+            
+            status.textContent = 'Place your finger on the scanner';
+            attendanceStatus.textContent = 'Not marked yet';
+        }
+
+        function joinClass(classId) {
+            alert(`Joining class: ${classId}`);
+        }
+
+        // Close sidebar when clicking outside on mobile
+        document.addEventListener('click', function(event) {
+            const sidebar = document.getElementById('sidebar');
+            const menuToggle = document.querySelector('.menu-toggle');
+            
+            if (window.innerWidth <= 768 && 
+                !sidebar.contains(event.target) && 
+                !menuToggle.contains(event.target) && 
+                sidebar.classList.contains('open')) {
+                sidebar.classList.remove('open');
+            }
+        });
+
+        // Handle window resize
+        window.addEventListener('resize', function() {
+            const sidebar = document.getElementById('sidebar');
+            if (window.innerWidth > 768) {
+                sidebar.classList.remove('open');
+            }
+        });
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            const status = document.getElementById('scannerStatus');
+            
+            if (isWebAuthnSupported()) {
+                status.textContent = 'Place your finger on the scanner';
+            } else {
+                status.textContent = 'Biometric auth not supported - will use simulation';
+            }
+        });
+    </script>
+</body>
+</html>
